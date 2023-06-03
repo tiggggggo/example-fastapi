@@ -327,6 +327,7 @@ class DayData(Base):
     tau_active_state_uc = Column(Integer)
     counter_byte_gprs = Column(Integer)
     status_flags = Column(Integer)
+    energy = Column(Float, default=0)
 
 
 class MonthData(Base):
