@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException, Query
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -9,18 +9,15 @@ from app.utils import date_utils, depends_utils
 router = APIRouter(
     prefix="/data",
     tags=["Data"]
-
 )
 
 
-@router.get("/hour")
-def get_hour_data(tube_id: int,
-                  start_date: str,
-                  end_date: str,
+@router.get("/hour", description='Return hour (for specific tubes 15 min) data')
+def get_hour_data(tube_id: int = Query(description='Description Tube id', example=235),
+                  start_date: str = Query(description='Start date in format "%Y-%m-%d"', example='2023-04-23'),
+                  end_date: str = Query(description='End date in format "%Y-%m-%d"', example='2023-04-24'),
                   tube: models.Tube = Depends(depends_utils.get_tube),
                   db: Session = Depends(get_db)):
-    # # Renaming the 'old_column_name' to 'new_column_name' in the query result
-    # renamed_results = session.query(MyModel.old_column_name.label('new_column_name')).all()
     contract_hour = get_tube_contract_hour(db, tube_id)
 
     start_date = date_utils.get_datetime(start_date, contract_hour=contract_hour)
@@ -35,10 +32,10 @@ def get_hour_data(tube_id: int,
     return hour_data
 
 
-@router.get("/day")
-def get_day_data(tube_id: int,
-                 start_date: str,
-                 end_date: str,
+@router.get("/day", description='Return daily data for period')
+def get_day_data(tube_id: int = Query(description='Tube id', example=235),
+                 start_date: str = Query(description='Start date in format "%Y-%m-%d"', example='2023-04-01'),
+                 end_date: str = Query(description='End date in format "%Y-%m-%d"', example='2023-05-01'),
                  tube: models.Tube = Depends(depends_utils.get_tube),
                  db: Session = Depends(get_db)):
     contract_hour = get_tube_contract_hour(db, tube_id)
@@ -55,10 +52,10 @@ def get_day_data(tube_id: int,
     return day_data
 
 
-@router.get("/month")
-def get_month_data(tube_id: int,
-                   start_date: str,
-                   end_date: str,
+@router.get("/month", description='Return month data for period')
+def get_month_data(tube_id: int = Query(description='Tube id', example=235),
+                   start_date: str = Query(description='Start date in format "%Y-%m"', example='2023-04'),
+                   end_date: str = Query(description='End date in format "%Y-%m"', example='2023-05'),
                    tube: models.Tube = Depends(depends_utils.get_tube),
                    db: Session = Depends(get_db)):
     start_date = date_utils.get_datetime(start_date, date_format=date_utils.QUERY_MONTH_FORMAT)
@@ -73,9 +70,9 @@ def get_month_data(tube_id: int,
 
 
 @router.get("/alarm")
-def get_alarm_data(device_id: int,
-                   start_date: str,
-                   end_date: str,
+def get_alarm_data(device_id: int = Query(description='Device id', example=223),
+                   start_date: str = Query(description='Start date in format "%Y-%m-%d"', example='2023-01-13'),
+                   end_date: str = Query(description='End date in format "%Y-%m-%d"', example='2023-05-25'),
                    device: models.Device = Depends(depends_utils.get_device),
                    db: Session = Depends(get_db)):
     start_date = date_utils.get_datetime(start_date)

@@ -9,13 +9,11 @@ from app.utils import utils
 router = APIRouter(
     prefix="/users",
     tags=["Users"]
-
 )
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserRead)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # hash the password
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
     existing_user = db.query(models.User).filter(models.User.email == user.email).first()

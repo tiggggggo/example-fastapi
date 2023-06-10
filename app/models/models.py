@@ -1,33 +1,11 @@
 import datetime
 
-from sqlalchemy import Boolean, Column, Table, Integer, String, ForeignKey, Float, BigInteger, Text
-# from sqlalchemy.sql.sqltypes import TIMESTAMP, TIME
+from sqlalchemy import Column, Table, Integer, String, ForeignKey, Float, BigInteger, Text
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 
 from app.database.database import Base
-
-
-class Post(Base):
-    __tablename__ = "posts"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    published = Column(Boolean, server_default="TRUE", nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True),
-                        nullable=False, server_default=text('now()'))
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    user = relationship("User")
-
-
-class Vote(Base):
-    __tablename__ = "votes"
-
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True)
-
 
 UserDevice = Table(
     'user_device',
@@ -36,11 +14,6 @@ UserDevice = Table(
     Column('device_id', Integer, ForeignKey('device.id'))
 )
 
-
-# generate tables from sql alchemy
-# try backup
-# if backup does not work
-# update column types based on postgres types
 
 class User(Base):
     __tablename__ = "users"
@@ -52,7 +25,6 @@ class User(Base):
                         nullable=False, server_default=text('now()'))
 
     devices = relationship("Device", secondary=UserDevice, back_populates="users")
-    # tubes = relationship('Tube', secondary=UserDevice, back_populates='users')
 
 
 class Device(Base):
@@ -246,8 +218,6 @@ class Tube(Base):
     date_control_diaf = Column(TIMESTAMP(timezone=False))
     method_orifice = Column(Integer)
 
-    # users = relationship("User", secondary=UserDevice, back_populates="tubes",
-    #                      primaryjoin=id == UserDevice.c.tube_id, secondaryjoin=id == UserDevice.c.user_id)
     device = relationship("Device", back_populates="tubes")
 
 
